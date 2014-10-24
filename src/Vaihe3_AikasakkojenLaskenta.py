@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: latin-1 -*-
 #------------------------------
 # METROPACCESS-DIGIROAD
 # MetropAccess-tutkimushanke
@@ -62,8 +62,8 @@ NetworkData = arcpy.GetParameterAsText(0)
 #Parsitaan loppujen tarvittavien tiedostojen nimet ja sijainti:
 desc = arcpy.Describe(NetworkData)
 NDPath = desc.path
-LiikenneElementit = os.path.join(NDPath, desc.edgeSources[0].name) #Parsitaan Liikenne_Elementti -tiedoston polku ja nimi
-LiikenneJunctions = os.path.join(NDPath, desc.junctionSources[0].name) #Parsitaan Junctions -tiedoston polku ja nimi
+LiikenneElementit = os.path.join(NDPath, desc.edgeSources[0].name) + ".shp" #Parsitaan Liikenne_Elementti -tiedoston polku ja nimi
+LiikenneJunctions = os.path.join(NDPath, desc.junctionSources[0].name) + ".shp" #Parsitaan Junctions -tiedoston polku ja nimi
 #--------------------------------
 
 #Määritetään workspace:
@@ -71,26 +71,30 @@ LiikennevaloDir = os.path.dirname(LiikenneElementit)
 env.workspace = LiikennevaloDir
 
 #Luodaan FeatureDataset laskentadatoille (ArcGIS bugittaa jos näin ei tehdä)
+gdb = 'temp.gdb'
 featureDS = "Calculations"
 prjFile = LiikenneElementit[:-4] + ".prj"
-gdbPath = os.path.dirname(LiikennevaloDir)
-Workspace = gdbPath
-scratchWorkspace = os.path.dirname(gdbPath)
-calcPath = os.path.join(gdbPath, featureDS)
+#gdbPath = os.path.dirname(LiikennevaloDir)
+Workspace = os.path.dirname(LiikennevaloDir)
+scratchWorkspace = os.path.dirname(Workspace)
+calcPath = os.path.join(LiikennevaloDir, gdb)
+
+msg(calcPath)
 
 if not arcpy.Exists(calcPath):
-    arcpy.CreateFeatureDataset_management(gdbPath,featureDS, LiikenneElementit)
+    arcpy.CreateFileGDB_management(LiikennevaloDir, gdb)
+    arcpy.CreateFeatureDataset_management(calcPath,featureDS, prjFile)
 
 if not arcpy.Exists(LiikenneJunctions): #Tarkistetaan, että Junctions.shp tiedosto löytyy
-    teksti = "Tiedostoa " + LiikenneJunctions + " ei löydy! Tarkista, että kansiosta, jossa sijaitsee käyttämäsi Network Dataset löytyy myös pistetiedosto seuraavassa kirjoitusmuodossa: '<NimeämäsiNetworkDataset>_ND_Junctions.shp'."
+    teksti = "Tiedostoa " + LiikenneJunctions + " ei loydy! "  #Tarkista, että kansiosta, jossa sijaitsee kayttamasi Network Dataset loytyy myos pistetiedosto seuraavassa kirjoitusmuodossa: '<NimeamasiNetworkDataset>_ND_Junctions.shp'."
     virhe(teksti)
 
 
-Liikennevalosegmentti = "Liikennevalosegmentti"
+Liikennevalosegmentti = "Liikennevalosegmentti.shp"
 if arcpy.Exists(Liikennevalosegmentti): #Tarkistetaan, että Liikennevalosegmentti.shp tiedosto löytyy
-    Liikennevalosegmentti = os.path.join(LiikennevaloDir,"Liikennevalosegmentti")
+    Liikennevalosegmentti = os.path.join(LiikennevaloDir,Liikennevalosegmentti)
 else:
-    teksti = "ERROR: Tarvittavaa tiedostoa 'Liikennevalosegmentti' ei löydy! Suorita 1. työvaihe uudelleen tai siirrä Liikennevalosegmentti-tiedosto haluttuun kansioon (alla) ja palaa sen jälkeen suorittamaan tämä työvaihe."
+    teksti = "ERROR: Tarvittavaa tiedostoa 'Liikennevalosegmentti.shp' ei löydy! Suorita 1. työvaihe uudelleen tai siirrä Liikennevalosegmentti-tiedosto haluttuun kansioon (alla) ja palaa sen jälkeen suorittamaan tämä työvaihe."
     tempSijainti = "Tiedostoa etsittiin kansiosta: " + LiikennevaloDir
     msg(teksti)
     msg(tempSijainti)
@@ -180,7 +184,7 @@ Aloitus()
 arcpy.SetProgressor("step", "AIKASAKKOJEN LASKENTA...Määritetään tie-elementit, joihin vaikuttavat liikennevalot...", 0, 100, 10) #Luodaan suoritusinfopalkki
 
 #Tehdään Liikennevalosegmenteistä pistemuotoinen:
-LVSpoint = os.path.join(LiikennevaloDir,"LiikennevaloSegmenttiPoint")
+LVSpoint = os.path.join(LiikennevaloDir,"LiikennevaloSegmenttiPoint.shp")
 ExDel(LVSpoint)
 arcpy.FeatureToPoint_management(Liikennevalosegmentti, LVSpoint, "CENTROID")
 arcpy.SetProgressorPosition(5)

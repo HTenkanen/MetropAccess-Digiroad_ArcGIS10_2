@@ -99,8 +99,6 @@ def virhe(Virheilmoitus):
     arcpy.AddError(Virheilmoitus)
     sys.exit()
 
-msg(temp)
-
 #Metodit/m‰‰ritykset:
 
 arcpy.overwriteOutputs = True
@@ -519,7 +517,7 @@ if Details == "1":
     Details = "SIMPLE_POLYS"
 elif "Hierarkia" not in NDparams and Details == "2":
     Details = "DETAILED_POLYS"
-elif "Hierarkia" in NDparams and Details == "2" and ArcVersio != "10.1": #Jos hierarkiaa k‰ytet‰‰n ei voida k‰ytt‰‰ Detailed Polygoneja ArcGIS 10.1!
+elif "Hierarkia" in NDparams and Details == "2" and ArcVersio == "10.0": #Jos hierarkiaa k‰ytet‰‰n ei voida k‰ytt‰‰ Detailed Polygoneja ArcGIS 10.1/10.2!
     Details = "DETAILED_POLYS"
 elif Details == "3":
     Details = "NO_POLYS"
@@ -557,7 +555,7 @@ else:
 #--------------------------------
 #Tarkistetaan polygonin Trimmaus:
 
-if "Hierarkia" in NDparams and ArcVersio == "10.1": #Jos hierarkiaa k‰ytet‰‰n ei voida k‰ytt‰‰ Trimmi‰
+if "Hierarkia" in NDparams and ArcVersio != "10.0": #Jos hierarkiaa k‰ytet‰‰n ei voida k‰ytt‰‰ Trimmi‰
     Trim = "NO_TRIM_POLYS"
 elif Trim == "False":
     Trim = "NO_TRIM_POLYS"
