@@ -72,6 +72,7 @@ env.workspace = LiikennevaloDir
 
 #Luodaan FeatureDataset laskentadatoille (ArcGIS bugittaa jos näin ei tehdä)
 featureDS = "Calculations"
+prjFile = LiikenneElementit[:-4] + ".prj"
 gdbPath = os.path.dirname(LiikennevaloDir)
 Workspace = gdbPath
 scratchWorkspace = os.path.dirname(gdbPath)
